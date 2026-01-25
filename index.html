@@ -2,8 +2,9 @@
 <html lang="ru">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
   <title>Переводчик крякозябр ;D</title>
+
   <style>
     :root{
       --win-border:#0b2f49;
@@ -35,7 +36,11 @@
       background:#111;
       font-family: Tahoma, Verdana, Arial, sans-serif;
       color:var(--text);
+      padding: 20px;
     }
+
+    /* трохи краще для телефону */
+    button{ touch-action: manipulation; }
 
     /* “Вікно” */
     .window{
@@ -48,6 +53,7 @@
       overflow:hidden;
     }
 
+    /* Імітація заголовка старого Windows */
     .titlebar{
       height: 28px;
       background: linear-gradient(to bottom, #d9e6f6 0%, #bcd3ee 100%);
@@ -68,6 +74,7 @@
       position:relative;
     }
 
+    /* Верхні кнопки */
     .top-buttons{
       display:flex;
       gap: 10px;
@@ -82,6 +89,7 @@
       color: #fff;
       font-weight: 700;
       font-size: 18px;
+      letter-spacing: .2px;
       cursor:pointer;
       box-shadow:
         inset 0 1px 0 rgba(255,255,255,.25),
@@ -95,6 +103,7 @@
         0 1px 0 rgba(0,0,0,.2);
     }
 
+    /* Поля вводу */
     .panes{
       display:flex;
       gap: 10px;
@@ -120,6 +129,7 @@
       font-family: Tahoma, Verdana, Arial, sans-serif;
     }
 
+    /* Нижні кнопки */
     .bottom{
       position:absolute;
       right: 10px;
@@ -146,6 +156,7 @@
     }
     .btn2:active{ transform: translateY(1px); }
 
+    /* Водяний знак */
     .stamp{
       position:absolute;
       left: -10px;
@@ -155,6 +166,7 @@
       transform: rotate(-16deg);
       opacity: .30;
       pointer-events:none;
+      filter: saturate(0.9);
     }
     .stamp .box{
       width:100%;
@@ -173,8 +185,72 @@
       text-align:center;
       line-height: 1.05;
     }
+
+    /* =========================
+       📱 MOBILE ADAPTATION
+       ========================= */
+    @media (max-width: 640px) {
+      body{
+        padding: 10px;
+        place-items: start center;
+      }
+
+      .window{
+        width: 100%;
+        max-width: 100%;
+        height: auto;
+        overflow: visible;
+      }
+
+      .content{
+        height: auto;
+      }
+
+      .top-buttons{
+        flex-direction: column;
+      }
+
+      .btn{
+        width: 100%;
+        height: 44px;
+        font-size: 16px;
+      }
+
+      .panes{
+        flex-direction: column;
+        height: auto;
+      }
+
+      .pane{
+        min-height: 150px;
+      }
+
+      textarea{
+        font-size: 16px; /* iOS: щоб не зумило */
+      }
+
+      .bottom{
+        position: static;
+        margin-top: 12px;
+        justify-content: space-between;
+      }
+
+      .btn2{
+        width: 48%;
+        height: 44px;
+        font-size: 16px;
+      }
+
+      .stamp{
+        position: static;
+        transform: rotate(-10deg);
+        margin-top: 14px;
+        opacity: 0.2;
+      }
+    }
   </style>
 </head>
+
 <body>
   <div class="window" id="win">
     <div class="titlebar">
@@ -210,7 +286,8 @@
   </div>
 
   <script>
-    // Мапінг розкладки EN<->RU (Ghbvth -> Привет)
+    // EN <-> RU layout map (Ghbvth -> Привет)
+    // Під RU рядок підібрано так, щоб відповідало EN символам по індексу
     const en = "`qwertyuiop[]\\asdfghjkl;'zxcvbnm,./";
     const ru = "ёйцукенгшщзхъ\\фывапролджэячсмитьбю.";
 
@@ -231,10 +308,9 @@
       return out;
     }
 
-    const left = document.getElementById("left");
+    const left  = document.getElementById("left");
     const right = document.getElementById("right");
 
-    // Кнопки як на скріншоті
     document.getElementById("btnLR").addEventListener("click", () => {
       right.value = swapLayout(left.value, en, ru);
     });
@@ -253,7 +329,7 @@
       document.getElementById("win").style.display = "none";
     });
 
-    // “Автопереклад” як підказка: друкуєш зліва — показує справа
+    // Автопереклад: друкуєш зліва — показує справа
     left.addEventListener("input", () => {
       right.value = swapLayout(left.value, en, ru);
     });
