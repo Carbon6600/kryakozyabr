@@ -22,6 +22,9 @@
       --btn2-border:#1c115f;
       --btn-active:#ff6b35;
       --text:#0a0a0a;
+      --w95-teal:#008080;
+      --w95-blue:#0000a8;
+      --w95-gray:#c0c0c0;
     }
 
     *{ box-sizing:border-box; }
@@ -34,10 +37,12 @@
       font-family: Tahoma, Verdana, Arial, sans-serif;
       color:var(--text);
       padding: 20px;
+      overflow: hidden;
     }
 
     button{ touch-action: manipulation; }
 
+    /* === ГОЛОВНЕ ВІКНО === */
     .window{
       width: 505px;
       height: 380px;
@@ -46,6 +51,7 @@
       box-shadow: 0 10px 30px rgba(0,0,0,.45);
       position:relative;
       overflow:hidden;
+      transition: opacity 0.3s;
     }
 
     .titlebar{
@@ -205,21 +211,148 @@
       line-height: 1.05;
     }
 
-    .restore-btn{
+    /* === ЕКРАН ВИХОДУ WINDOWS 95 === */
+    .shutdown-screen{
       position: fixed;
-      top: 20px;
-      left: 50%;
-      transform: translateX(-50%);
-      padding: 10px 20px;
-      background: var(--btn-active);
-      color: white;
-      border: none;
-      border-radius: 6px;
-      cursor: pointer;
-      font-weight: bold;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: var(--w95-teal);
       display: none;
-      z-index: 1000;
-      box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
+      font-family: "MS Sans Serif", Tahoma, sans-serif;
+    }
+
+    .shutdown-screen.active{
+      display: flex;
+      animation: fadeIn 0.5s ease;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    .w95-window{
+      width: 400px;
+      background: var(--w95-gray);
+      border: 3px solid;
+      border-color: #ffffff #808080 #808080 #ffffff;
+      box-shadow: 2px 2px 10px rgba(0,0,0,0.5);
+      padding: 3px;
+    }
+
+    .w95-titlebar{
+      background: linear-gradient(90deg, #0000a8 0%, #1084d0 100%);
+      color: white;
+      padding: 3px 5px;
+      font-weight: bold;
+      font-size: 14px;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .w95-titlebar::before{
+      content: "🖥️";
+      font-size: 12px;
+    }
+
+    .w95-content{
+      padding: 20px;
+      background: var(--w95-gray);
+      border: 2px solid;
+      border-color: #dfdfdf #000 #000 #dfdfdf;
+      margin-top: 3px;
+      text-align: center;
+    }
+
+    .w95-logo{
+      font-size: 48px;
+      margin-bottom: 15px;
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); opacity: 1; }
+      50% { transform: scale(1.1); opacity: 0.8; }
+    }
+
+    .w95-text{
+      font-size: 18px;
+      color: #000;
+      margin-bottom: 20px;
+      font-weight: bold;
+    }
+
+    .w95-progress{
+      width: 100%;
+      height: 20px;
+      background: #fff;
+      border: 2px inset #808080;
+      margin-bottom: 20px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .w95-progress-bar{
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, #0000a8 0%, #1084d0 100%);
+      animation: progress 4s linear forwards;
+    }
+
+    @keyframes progress {
+      0% { width: 0%; }
+      100% { width: 100%; }
+    }
+
+    .w95-buttons{
+      display: flex;
+      gap: 10px;
+      justify-content: center;
+    }
+
+    .w95-btn{
+      padding: 5px 20px;
+      background: var(--w95-gray);
+      border: 2px outset #fff;
+      font-size: 14px;
+      cursor: pointer;
+      font-family: "MS Sans Serif", Tahoma, sans-serif;
+    }
+
+    .w95-btn:active{
+      border: 2px inset #fff;
+    }
+
+    .w95-btn:hover{
+      background: #d4d4d4;
+    }
+
+    .w95-clouds{
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      opacity: 0.1;
+      pointer-events: none;
+    }
+
+    .w95-cloud{
+      position: absolute;
+      background: white;
+      border-radius: 50%;
+      animation: float 20s infinite linear;
+    }
+
+    @keyframes float {
+      from { transform: translateX(-100px); }
+      to { transform: translateX(calc(100vw + 100px)); }
     }
 
     /* =========================
@@ -285,13 +418,17 @@
         margin-top: 14px;
         opacity: 0.2;
       }
+
+      .w95-window{
+        width: 90%;
+        max-width: 350px;
+      }
     }
   </style>
 </head>
 
 <body>
-  <button class="restore-btn" id="restore" onclick="restoreWindow()">↻ Відновити вікно</button>
-  
+  <!-- ГОЛОВНЕ ВІКНО -->
   <div class="window" id="win">
     <div class="titlebar">
       <div class="title">Перекладач крякозябр ;D</div>
@@ -299,18 +436,18 @@
 
     <div class="content">
       <div class="top-buttons">
-        <button class="btn active" id="btnLR">[ EN → UA ]</button>
+        <button class="btn" id="btnLR">[ EN → UA ]</button>
         <button class="btn" id="btnRL">[ UA → EN ]</button>
       </div>
 
       <div class="panes">
         <div class="pane">
-          <span class="pane-label">ВХІД</span>
-          <textarea id="left" spellcheck="false" placeholder="Введи текст...">Ghbvth</textarea>
+          <span class="pane-label" id="label-left">ВХІД (EN)</span>
+          <textarea id="left" spellcheck="false" placeholder="Введи текст..."></textarea>
         </div>
         <div class="pane">
-          <span class="pane-label">РЕЗУЛЬТАТ</span>
-          <textarea id="right" spellcheck="false" placeholder="Тут з'явиться переклад..." readonly>Привіт</textarea>
+          <span class="pane-label" id="label-right">ВИХІД (UA)</span>
+          <textarea id="right" spellcheck="false" placeholder="Тут з'явиться переклад..."></textarea>
         </div>
       </div>
 
@@ -328,108 +465,169 @@
     </div>
   </div>
 
+  <!-- ЕКРАН ВИХОДУ WINDOWS 95 -->
+  <div class="shutdown-screen" id="shutdownScreen">
+    <div class="w95-clouds" id="clouds"></div>
+    
+    <div class="w95-window">
+      <div class="w95-titlebar">Завершення роботи Windows</div>
+      <div class="w95-content">
+        <div class="w95-logo">🖥️</div>
+        <div class="w95-text">Зачекайте, Windows завершує роботу...</div>
+        <div class="w95-progress">
+          <div class="w95-progress-bar" id="progressBar"></div>
+        </div>
+        <div class="w95-buttons">
+          <button class="w95-btn" id="cancelShutdown">Скасувати</button>
+          <button class="w95-btn" id="forceExit">Вийти зараз</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <script>
     // ===== Keyboard layout maps =====
-    // English layout (включаючи цифри та спецсимволи)
     const en = "`1234567890-=qwertyuiop[]\\asdfghjkl;'zxcvbnm,./";
-    // Ukrainian layout (відповідність)
     const ua = "'1234567890-=йцукенгшщзхї\\фівапролджєячсмитьбю.";
-
-    // Маппінг для великих літер
     const enUpper = en.toUpperCase();
     const uaUpper = "Ґ1234567890-=ЙЦУКЕНГШЩЗХЇ\\ФІВАПРОЛДЖЄЯЧСМИТЬБЮ.";
+
+    const left = document.getElementById("left");
+    const right = document.getElementById("right");
+    const btnLR = document.getElementById("btnLR");
+    const btnRL = document.getElementById("btnRL");
+    const labelLeft = document.getElementById("label-left");
+    const labelRight = document.getElementById("label-right");
+    const win = document.getElementById("win");
+    const shutdownScreen = document.getElementById("shutdownScreen");
+
+    let direction = "AUTO";
 
     function swapLayout(text, from, to, fromUpper, toUpper){
       let out = "";
       for (const ch of text){
-        // Перевіряємо малі літери
         let idx = from.indexOf(ch);
         if (idx !== -1) {
-          out += to[idx] ?? ch;
+          out += to[idx] || ch;
           continue;
         }
-        // Перевіряємо великі літери
         idx = fromUpper.indexOf(ch);
         if (idx !== -1) {
-          const mapped = toUpper[idx] ?? to[idx] ?? ch;
+          const mapped = toUpper[idx] || to[idx] || ch;
           out += mapped;
           continue;
         }
-        // Якщо не знайшли — залишаємо як є
         out += ch;
       }
       return out;
     }
 
-    const left  = document.getElementById("left");
-    const right = document.getElementById("right");
-    const btnLR = document.getElementById("btnLR");
-    const btnRL = document.getElementById("btnRL");
+    function translate() {
+      const leftText = left.value;
+      const rightText = right.value;
+      
+      let currentDirection = direction;
+      
+      if (direction === "AUTO") {
+        const activeElement = document.activeElement;
+        
+        if (activeElement === left && leftText) {
+          currentDirection = "EN_UA";
+        } else if (activeElement === right && rightText) {
+          currentDirection = "UA_EN";
+        } else if (leftText && !rightText) {
+          currentDirection = "EN_UA";
+        } else if (rightText && !leftText) {
+          currentDirection = "UA_EN";
+        } else {
+          currentDirection = "EN_UA";
+        }
+      }
 
-    let direction = "EN_UA";
+      if (currentDirection === "EN_UA") {
+        right.value = swapLayout(leftText, en, ua, enUpper, uaUpper);
+      } else {
+        left.value = swapLayout(rightText, ua, en, uaUpper, enUpper);
+      }
+      
+      updateLabels(currentDirection);
+    }
 
-    function updateButtons() {
-      if (direction === "EN_UA") {
+    function updateLabels(dir) {
+      if (dir === "EN_UA") {
+        labelLeft.textContent = "ВХІД (EN)";
+        labelRight.textContent = "ВИХІД (UA)";
         btnLR.classList.add("active");
         btnRL.classList.remove("active");
-        right.setAttribute("readonly", "true");
-        left.removeAttribute("readonly");
       } else {
+        labelLeft.textContent = "ВИХІД (EN)";
+        labelRight.textContent = "ВХІД (UA)";
         btnRL.classList.add("active");
         btnLR.classList.remove("active");
-        left.setAttribute("readonly", "true");
-        right.removeAttribute("readonly");
       }
     }
 
-    function translate() {
-      if (direction === "EN_UA") {
-        right.value = swapLayout(left.value, en, ua, enUpper, uaUpper);
-      } else {
-        left.value = swapLayout(right.value, ua, en, uaUpper, enUpper);
-      }
-    }
-
-    // EN -> UA
-    btnLR.addEventListener("click", () => {
+    // Ручне перемикання
+    btnLR.addEventListener("click", function() {
       direction = "EN_UA";
-      updateButtons();
       translate();
       left.focus();
     });
 
-    // UA -> EN
-    btnRL.addEventListener("click", () => {
+    btnRL.addEventListener("click", function() {
       direction = "UA_EN";
-      updateButtons();
       translate();
       right.focus();
     });
 
-    // Очистити
-    document.getElementById("clear").addEventListener("click", () => {
-      left.value = "";
-      right.value = "";
-      if (direction === "EN_UA") {
-        left.focus();
-      } else {
-        right.focus();
+    // Автопереклад при введенні
+    left.addEventListener("input", function() {
+      if (direction === "AUTO") {
+        direction = "EN_UA";
       }
+      translate();
     });
 
-    // Копіювати результат
-    document.getElementById("copy").addEventListener("click", async () => {
+    right.addEventListener("input", function() {
+      if (direction === "AUTO") {
+        direction = "UA_EN";
+      }
+      translate();
+    });
+
+    // При фокусі оновлюємо мітки
+    left.addEventListener("focus", function() {
+      if (direction === "AUTO") updateLabels("EN_UA");
+    });
+    
+    right.addEventListener("focus", function() {
+      if (direction === "AUTO") updateLabels("UA_EN");
+    });
+
+    // Очистити
+    document.getElementById("clear").addEventListener("click", function() {
+      left.value = "";
+      right.value = "";
+      direction = "AUTO";
+      btnLR.classList.remove("active");
+      btnRL.classList.remove("active");
+      labelLeft.textContent = "ВХІД (EN)";
+      labelRight.textContent = "ВИХІД (UA)";
+      left.focus();
+    });
+
+    // Копіювати
+    document.getElementById("copy").addEventListener("click", async function() {
       const textToCopy = direction === "EN_UA" ? right.value : left.value;
+      if (!textToCopy) return;
+      
       try {
         await navigator.clipboard.writeText(textToCopy);
         const btn = document.getElementById("copy");
         const originalText = btn.textContent;
         btn.textContent = "✓ Скопійовано!";
-        setTimeout(() => {
-          btn.textContent = originalText;
-        }, 1500);
+        setTimeout(function() { btn.textContent = originalText; }, 1500);
       } catch (err) {
-        // Fallback для старих браузерів
         const textArea = document.createElement("textarea");
         textArea.value = textToCopy;
         document.body.appendChild(textArea);
@@ -439,43 +637,61 @@
       }
     });
 
-    // Вихід (приховує вікно)
-    document.getElementById("exit").addEventListener("click", () => {
-      document.getElementById("win").style.display = "none";
-      document.getElementById("restore").style.display = "block";
-    });
-
-    // Відновити вікно
-    function restoreWindow() {
-      document.getElementById("win").style.display = "block";
-      document.getElementById("restore").style.display = "none";
+    // === ЕКРАН ВИХОДУ WINDOWS 95 ===
+    
+    function generateClouds() {
+      const container = document.getElementById("clouds");
+      container.innerHTML = "";
+      for (let i = 0; i < 5; i++) {
+        const cloud = document.createElement("div");
+        cloud.className = "w95-cloud";
+        cloud.style.width = (100 + Math.random() * 100) + "px";
+        cloud.style.height = (60 + Math.random() * 40) + "px";
+        cloud.style.top = (Math.random() * 80) + "%";
+        cloud.style.left = "-200px";
+        cloud.style.animationDelay = (i * 4) + "s";
+        cloud.style.animationDuration = (15 + Math.random() * 10) + "s";
+        container.appendChild(cloud);
+      }
     }
 
-    // Auto translate при введенні
-    left.addEventListener("input", () => {
-      if (direction === "EN_UA") {
-        translate();
-      }
+    document.getElementById("exit").addEventListener("click", function() {
+      shutdownScreen.classList.add("active");
+      generateClouds();
+      
+      setTimeout(function() {
+        document.body.innerHTML = '<div style="background:black;height:100vh;width:100vw;display:flex;align-items:center;justify-content:center;color:#666;font-family:monospace;">It is now safe to turn off your computer.</div>';
+        document.title = "Windows is now shutting down...";
+      }, 4500);
     });
 
-    right.addEventListener("input", () => {
-      if (direction === "UA_EN") {
-        translate();
-      }
+    document.getElementById("cancelShutdown").addEventListener("click", function() {
+      shutdownScreen.classList.remove("active");
+      document.getElementById("clouds").innerHTML = "";
+      const bar = document.getElementById("progressBar");
+      bar.style.animation = "none";
+      void bar.offsetHeight;
+      bar.style.animation = null;
+    });
+
+    document.getElementById("forceExit").addEventListener("click", function() {
+      document.body.innerHTML = '<div style="background:black;height:100vh;width:100vw;display:flex;align-items:center;justify-content:center;color:#666;font-family:monospace;">It is now safe to turn off your computer.</div>';
+      document.title = "It is now safe to turn off your computer.";
     });
 
     // Hotkeys
-    document.addEventListener("keydown", (e) => {
-      if (e.key === "Escape") document.getElementById("clear").click();
-      if (e.ctrlKey && e.key.toLowerCase() === "c" && !window.getSelection().toString()) {
-        e.preventDefault();
-        document.getElementById("copy").click();
+    document.addEventListener("keydown", function(e) {
+      if (e.key === "Escape") {
+        if (shutdownScreen.classList.contains("active")) {
+          document.getElementById("cancelShutdown").click();
+        } else {
+          document.getElementById("clear").click();
+        }
       }
     });
 
     // Init
-    updateButtons();
-    translate();
+    left.focus();
   </script>
 </body>
 </html>
